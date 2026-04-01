@@ -9,7 +9,7 @@ import { products, Product } from "@/lib/products-data"
 
 const categories = [
   "All",
-  "Outdor",
+  "Outdoor",
   "Indoor",
   "Creative",
   "Rental",
