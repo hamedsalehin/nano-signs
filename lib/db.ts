@@ -1,37 +1,7 @@
-// Database stub - Replace with Prisma when npm dependencies are installed
-// This placeholder prevents import errors during development
+import { PrismaClient } from "@prisma/client"
 
-export const prisma = {
-  user: {
-    findUnique: async () => null,
-    findMany: async () => [],
-    create: async (data: any) => data,
-    update: async (data: any) => data,
-    delete: async () => null,
-  },
-  product: {
-    findUnique: async () => null,
-    findMany: async () => [],
-    create: async (data: any) => data,
-    update: async (data: any) => data,
-    delete: async () => null,
-  },
-  cart: {
-    findMany: async () => [],
-    create: async (data: any) => data,
-    update: async (data: any) => data,
-    delete: async () => null,
-  },
-  order: {
-    create: async (data: any) => data,
-    findMany: async () => [],
-    findUnique: async () => null,
-    update: async (data: any) => data,
-  },
-  ticket: {
-    create: async (data: any) => data,
-    findMany: async () => [],
-    findUnique: async () => null,
-    update: async (data: any) => data,
-  },
-} as any
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
+
+export const prisma = globalForPrisma.prisma || new PrismaClient()
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
