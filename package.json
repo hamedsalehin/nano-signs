@@ -6,14 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
-    "db:push": "prisma db push",
-    "db:seed": "prisma db seed",
-    "db:migrate": "prisma migrate dev"
+    "lint": "eslint ."
   },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
-  },
+
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
     "@prisma/client": "^6.19.2",
