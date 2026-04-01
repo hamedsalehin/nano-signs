@@ -29,12 +29,23 @@ export default function AccountPage() {
 
   const fetchUserData = async () => {
     try {
-      const res = await fetch('/api/v1/auth/me')
+      const token = localStorage.getItem('auth_token')
+      if (!token) {
+        router.push('/login')
+        return
+      }
+      
+      const res = await fetch('/api/v1/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
       if (res.ok) {
         const data = await res.json()
         setUser(data.user)
       } else {
-        router.push('/admin/login')
+        localStorage.removeItem('auth_token')
+        router.push('/login')
       }
     } catch {
       toast.error('Failed to load user data')

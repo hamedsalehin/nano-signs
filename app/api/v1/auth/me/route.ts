@@ -1,21 +1,25 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getCurrentUser, getAuthToken } from "@/lib/auth"
 import { prisma } from "@/lib/db"
+import jwt from "jsonwebtoken"
+
+const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-key-change-in-production"
 
 export async function GET(request: NextRequest) {
   try {
-    const token = await getAuthToken()
-
-    if (!token) {
+    const authHeader = request.headers.get("Authorization")
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       )
     }
 
-    const userInfo = await getCurrentUser()
+    const token = authHeader.substring(7)
+    let decoded: any
 
-    if (!userInfo) {
+    try {
+      decoded = jwt.verify(token, JWT_SECRET)
+    } catch (e) {
       return NextResponse.json(
         { error: "Invalid token" },
         { status: 401 }
@@ -23,7 +27,7 @@ export async function GET(request: NextRequest) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: userInfo.userId },
+      where: { id: decoded.userId },
       select: {
         id: true,
         email: true,
