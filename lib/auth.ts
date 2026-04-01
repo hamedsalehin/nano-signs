@@ -69,9 +69,38 @@ export async function clearAuthCookie() {
   clearAuthTokenFromStorage()
 }
 
+
+import jwt from "jsonwebtoken"
+const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-key-change-in-production"
+
 export async function requireAuth(request?: any) {
   try {
-    const user = await getCurrentUser()
+    let token = ""
+    if (request && typeof request.headers?.get === "function") {
+      const authHeader = request.headers.get("Authorization")
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        token = authHeader.substring(7)
+      }
+    }
+    
+    if (!token) {
+      // Fallback to old behavior for non-request contexts if any exist
+      token = getAuthTokenFromStorage() || ""
+    }
+
+    if (!token) {
+      return { isValid: false, error: "Unauthorized" }
+    }
+
+    // Attempt to verify via jsonwebtoken
+    let user: any
+    try {
+      user = jwt.verify(token, JWT_SECRET)
+    } catch {
+      // Fallback to legacy decode if it was generated differently
+      user = decodeToken(token)
+    }
+
     if (!user) {
       return { isValid: false, error: "Unauthorized" }
     }
@@ -89,3 +118,4 @@ export async function requireAdmin(request?: any) {
   }
   return auth
 }
+
