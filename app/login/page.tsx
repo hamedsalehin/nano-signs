@@ -13,6 +13,7 @@ export const dynamic = 'force-dynamic'
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [name, setName] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [isLogin, setIsLogin] = useState(true)
@@ -25,10 +26,13 @@ export default function LoginPage() {
 
     try {
       const endpoint = isLogin ? "/api/v1/auth/login" : "/api/v1/auth/register"
+      
+      const payload = isLogin ? { email, password } : { email, password, name: name || email.split("@")[0] }
+
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(payload),
       })
 
       const data = await response.json()
@@ -83,6 +87,22 @@ export default function LoginPage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {!isLogin && (
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-2 block">Full Name</label>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      placeholder="John Doe"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="pl-3"
+                      required={!isLogin}
+                    />
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">Email or Username</label>
                 <div className="relative">
@@ -157,8 +177,6 @@ export default function LoginPage() {
         </Card>
 
         <div className="mt-6 text-center text-sm text-muted-foreground">
-          <p>Demo Admin Credentials:</p>
-          <p className="font-mono">root / root</p>
         </div>
       </div>
     </div>
